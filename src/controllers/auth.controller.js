@@ -1,8 +1,9 @@
 const { users } = require('../models/index')
-const { hashPass, verifyPassword } = require('../../utils/hashPassword.utils'),
+const { encryptData, verifyData } = require('../../utils/hash.utils'),
 response = require('../../utils/response.utils'),
 createError = require('http-errors'),
-jwt = require('jsonwebtoken')
+jwt = require('jsonwebtoken'),
+mailer = require('../../utils/mailer.utils')
 
 module.exports = {
     registerUser: async(req, res, next)=>{
@@ -23,7 +24,7 @@ module.exports = {
             const data = await users.create({
                 data:{
                     email,
-                    password: await hashPass(password)
+                    password: await encryptData(password)
                 }
             })
 
@@ -47,15 +48,11 @@ module.exports = {
                 throw createError(400, "Bad request")
             }
 
-            const user = await users.findUnique({
-                where: {
-                    email
-                }
-            });
+            const user = await users.findUnique( { where: { email } } );
 
             if(!user) throw createError(404, "Account is not registered, register first")
 
-            const isPassMatch = await verifyPassword(password, user.password)
+            const isPassMatch = await verifyData(password, user.password)
 
             if(!isPassMatch) throw createError(403, "Email or password is incorrect!")
 

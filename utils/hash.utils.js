@@ -1,7 +1,7 @@
 const bcrypt = require('bcrypt')
 
 module.exports = {
-    hashPass: async function(data){
+    encryptData: async function(data){
         try {
             if(typeof data !== 'string'){
                 throw new Error("Wrong data type")
@@ -12,7 +12,7 @@ module.exports = {
             throw error
         }
     },
-    verifyPassword: async function(data, encryptedData){
+    verifyData: async function(data, encryptedData){
         try {
             if(typeof data !== 'string'){
                 throw new Error("Wrong data type")
