@@ -5,7 +5,10 @@ const express = require('express'),
       PORT = process.env.PORT,
       logger = require('morgan'),
       createError = require('http-errors'),
-      router = require('./src/routes/index')
+      router = require('./src/routes/index'),
+      cors = require('cors')
+
+app.use(cors())
 app.use(express.urlencoded({ extended: false }));     
 app.use(express.json())
 
