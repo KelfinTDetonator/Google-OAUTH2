@@ -40,6 +40,7 @@ module.exports = {
             next(error)
         }
     },
+
     loginUser: async(req, res, next)=>{
         try {
             const {email, password} = req.body
@@ -65,6 +66,90 @@ module.exports = {
             next(error)
         }
     },
+
+    forgetPass: async(req, res, next)=>{
+        try {
+            const {email} = req.body;
+            if(!email){
+                throw createError(400, "Bad request")
+            }
+
+            const user = await users.findUnique( { where: { email } } );
+
+            if(!user) throw createError(404, "Account is not registered, register first");
+
+            const payload = { id: user.id, email: user.email };
+            const resetToken = jwt.sign(payload, process.env.SECRET_KEY, {expiresIn: '10m'}); //create reset token
+            const cryptedResetToken = await encryptData(resetToken)
+            
+            await users.update({
+                where:{
+                    id: user.id
+                },
+                data:{
+                    resetToken: cryptedResetToken
+                }
+            })
+
+            try {
+                const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/resetPassword/${resetToken}`  
+                const msg = `Password Reset request has received. Please use the link below to reset your password`
+                await mailer.sendAnEmail(user.email, msg, resetUrl) //send to the sender who request reset pass
+
+                res.status(200).send("Password reset link sent to your email account");
+
+            } catch (error) {
+                await users.update({
+                    where:{
+                        id: user.id
+                    },
+                    data:{
+                        resetToken: null
+                    }
+                })
+                throw createError(500, "There was an error when sending password reset to your email, try again later")
+            }
+        } catch (error) {
+            console.error(error)
+            next(error)
+        }
+    },
+
+    resetPass: async(req, res, next) => {
+        try {
+            const token = req.params.token.trim()
+            console.log(token.trim());
+            const isVerified = jwt.verify(token, process.env.SECRET_KEY);
+
+            if(!isVerified){
+                throw createError(403, "Forbidden");
+            }
+            const {id, email} = isVerified;
+
+            const user = await users.findUnique({
+                where: {
+                    email
+                }
+            })
+            if(!user) throw createError(404, "Not found");
+            console.log(user.resetToken, token);
+
+            const tokenIsNewGenerated = await verifyData(token.trim(), user.resetToken)
+            console.log(tokenIsNewGenerated);
+
+            if(!tokenIsNewGenerated){
+                throw createError(409, "Please use the newest link that sent to your email")
+            }
+
+            const {pw} = req.body
+            console.log(pw);
+            return res.status(201).json(response.success("Reset password succeed"))
+        } catch (error) {
+            console.error(error)
+            next(error)
+        }
+    },
+
     viewUser: async(req, res, next)=>{
         try {
             const userId = await res.user.id
