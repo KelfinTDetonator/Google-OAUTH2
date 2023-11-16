@@ -69,6 +69,7 @@ module.exports = {
 
     forgetPass: async(req, res, next)=>{
         try {
+            const MINUTE = process.env.EXP_IN_MINUTE
             const {email} = req.body;
             if(!email){
                 throw createError(400, "Bad request")
@@ -78,25 +79,40 @@ module.exports = {
 
             if(!user) throw createError(404, "Account is not registered, register first");
 
-            const payload = { id: user.id, email: user.email };
-            const resetToken = jwt.sign(payload, process.env.SECRET_KEY, {expiresIn: '10m'}); //create reset token
-            const cryptedResetToken = await encryptData(resetToken)
-            
+            const time = new Date()
+            const resetToken = require('crypto').randomBytes(16).toString('hex').concat(time.getTime())           
+                                                 //m    //s    //ms
+            const expiry = new Date(Date.now() + MINUTE * 60 * 1000)
+            console.log(expiry.toString());
+
+            //check if token is exist previously
+            const tokenIsExist = (user.resetToken) !== null ? true : false
+            if(tokenIsExist){
+                throw createError(403, "Please check your email, the token has been sent previously")
+            }
+
+            //if not exist
             await users.update({
                 where:{
                     id: user.id
                 },
                 data:{
-                    resetToken: cryptedResetToken
+                    resetToken,
+                    resetExp: expiry
                 }
             })
 
             try {
                 const resetUrl = `${req.protocol}://${req.get('host')}/api/v1/resetPassword/${resetToken}`  
-                const msg = `Password Reset request has received. Please use the link below to reset your password`
-                await mailer.sendAnEmail(user.email, msg, resetUrl) //send to the sender who request reset pass
+                const subject = `Password Reset request has received.`
+                const message = ` Please use the link below to reset your password. Link is valid for ${MINUTE} minutes.\n${resetUrl}`
+                await mailer.sendAnEmail(user.email, subject, message) //send to the sender who request reset pass
 
-                res.status(200).send("Password reset link sent to your email account");
+                return res.json({
+                    resetToken,
+                    resetExpiration: expiry.toString(),
+                    tokenExpiresIn: `${MINUTE} m`
+                })
 
             } catch (error) {
                 await users.update({
@@ -117,33 +133,65 @@ module.exports = {
 
     resetPass: async(req, res, next) => {
         try {
-            const token = req.params.token.trim()
+            const token = req.params.token.trim();
+            const {newPassword, retypedNewPassword} = req.body
             console.log(token.trim());
-            const isVerified = jwt.verify(token, process.env.SECRET_KEY);
-
-            if(!isVerified){
-                throw createError(403, "Forbidden");
+           
+            if(!token){
+                throw createError(400, "Bad Request: token is missing");
             }
-            const {id, email} = isVerified;
 
             const user = await users.findUnique({
-                where: {
-                    email
+                where:{
+                    resetToken: token
                 }
             })
+            
             if(!user) throw createError(404, "Not found");
             console.log(user.resetToken, token);
 
-            const tokenIsNewGenerated = await verifyData(token.trim(), user.resetToken)
-            console.log(tokenIsNewGenerated);
+            const now = new Date(Date.now()).valueOf()
+            if(user.resetExp > now){ //while user.resetExp time is still above now() datetime, then...
+                if(newPassword === retypedNewPassword){
+                    const newPass = await encryptData(newPassword)
+                    await users.update({ //change password
+                        where:{
+                            email: user.email
+                        },
+                        data:{
+                            password: newPass,
+                            resetExp: null,
+                            resetToken: null,
+                        }
+                    })
 
-            if(!tokenIsNewGenerated){
-                throw createError(409, "Please use the newest link that sent to your email")
+                    return res.status(200).json({
+                        expiration: user.resetExp,
+                        now,
+                        expiredToken: user.resetExp > now ? false : true,
+                        message: `Your new password has been set to your account`
+                    })
+                } else {
+                    throw createError(400, "Bad Request")
+                }
+            } else{
+                await users.update({ //reset field in DB after failed to change password
+                    where:{
+                        email: user.email
+                    },
+                    data:{
+                        resetExp: null,
+                        resetToken: null,
+                    }
+                })
+                return res.status(403).json({
+                    expiration: user.resetExp,
+                    now,
+                    expiredToken: user.resetExp > now ? true : false,
+                    message: `Your link has been expired. Please try again`
+                })
             }
 
-            const {pw} = req.body
-            console.log(pw);
-            return res.status(201).json(response.success("Reset password succeed"))
         } catch (error) {
             console.error(error)
             next(error)
