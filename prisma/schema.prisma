@@ -11,13 +11,14 @@ datasource db {
 }
 
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  password  String
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-  profile   Profile?
-  resetToken String? @map("reset_token")
+  id         Int       @id @default(autoincrement())
+  email      String    @unique
+  password   String
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  profile    Profile?
+  resetToken String?   @map("reset_token")
+  resetExp   DateTime?
   
   @@map("users")
 }
