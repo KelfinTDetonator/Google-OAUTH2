@@ -1,0 +1,25 @@
+<%- include ('./header') %>
+    <div class="container">
+        <form action="/api/v1/register" method="post">
+            <h2>Register Account</h2>
+            <div class="mb-3">
+                <label for="email" class="form-label">Email address</label>
+                <input type="email" class="form-control" id="email" name="email" placeholder="yourmail@email.com">
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" id="password" class="form-control" name="password" aria-describedby="passwordHelpBlock">
+                <div id="passwordHelpBlock" class="form-text">
+                Your password must be 8-20 characters long, contain letters and numbers, and must not contain spaces, special characters, or emoji.
+                </div>
+            </div>
+            <div class="mb-3">
+                <label for="confirmPass" class="form-label">Confirm Password</label>
+                <input type="password" id="password" class="form-control" name="confirmPass" aria-describedby="passwordHelpBlock">
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary mb-3" style="width: 100%;">Submit</button>
+            </div>
+        </form>
+    </div>
+<%- include ('./footer') %>

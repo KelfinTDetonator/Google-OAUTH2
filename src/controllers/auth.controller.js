@@ -8,9 +8,9 @@ mailer = require('../../utils/mailer.utils')
 module.exports = {
     registerUser: async(req, res, next)=>{
         try {
-            const {email, password} = req.body
+            const {email, password, confirmPass} = req.body
 
-            if(!(email && password)){
+            if(!(email && password && confirmPass)){
                 throw createError(400, "Bad syntax")
             }
             const isEmailExist = await users.findUnique({
@@ -20,7 +20,7 @@ module.exports = {
             });
 
             if(isEmailExist) throw createError(409, "Account is exist, login to your account instead")
-
+            if(password !== confirmPass) throw createError(403, "Password should match")
             const data = await users.create({
                 data:{
                     email,
@@ -33,7 +33,6 @@ module.exports = {
             };
 
             delete data.password;
-
             return res.status(201).json(response.success("User created", data))
         } catch (error) {
             console.error(error)
