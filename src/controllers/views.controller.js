@@ -18,5 +18,13 @@ module.exports = {
             console.error(error)
             next(error)
         }
+    },
+
+    viewDashboard: async(req, res, next)=>{
+        try {
+            res.render('index', {title: "Home"})
+        } catch (error) {
+            next(error)
+        }
     }
 }

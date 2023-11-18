@@ -14,9 +14,21 @@
                 </div>
             </div>
             <div class="col-auto">
-                <button type="submit" class="btn btn-primary mb-3" style="width: 100%;">Login</button>
+                <button type="submit" id="submitLogin" class="btn btn-primary mb-3" style="width: 100%;">Login</button>
             </div>
         </form>
     </div>
-  
+<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+<script>
+    try {
+        const socket = io();
+        const login = document.getElementById('submitLogin')
+
+        login.addEventListener('click', ()=>{
+            socket.emit('sendNotif', 'Welcome to the jungle')
+        })
+    } catch (error) {
+        console.error(error)
+    }
+</script>
 <%- include ('./footer') %>

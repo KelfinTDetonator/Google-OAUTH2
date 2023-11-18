@@ -58,8 +58,8 @@ module.exports = {
 
             const payload = { id: user.id, email: user.email }
             const token = jwt.sign(payload, process.env.SECRET_KEY, { expiresIn: '1h' })
-
-            return res.status(200).json(response.success("Login success", token))
+            // return res.status(200).json(response.success("Login success", token))
+            res.redirect(`${req.protocol}://${req.get('host')}/api/v1/home`)
         } catch (error) {
             console.error(error)
             next(error)

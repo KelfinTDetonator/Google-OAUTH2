@@ -1,10 +1,37 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <title><%= title %></title>
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.css" rel="stylesheet"/>
+</head>
+<body>
+  <h1><%= title %></h1>
+  <p>Welcome to <%= title %></p>
+  <script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
+  <script>
+    try {
+      const socket = io();
+        socket.on('newNotif', (msg)=>{
+          toastr.options = {
+          timeOut: 2000,
+          positionClass: 'toast-bottom-right',
+          showEasing: 'swing',
+          progressBar: true,
+          hideDuration: 0,
+          showDuration: 0,
+          debug: false
+        }
+        toastr.success(msg, 'Welcome')
+      })
+
+    } catch (error) {
+      console.error(error)
+    }
+    
+  </script>
+</body>
 </html>
