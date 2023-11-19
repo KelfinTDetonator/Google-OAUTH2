@@ -9,19 +9,33 @@ const express = require('express'),
       createError = require('http-errors'),
       { createServer } = require('http'),
       { Server } = require("socket.io"),
-      PORT = process.env.PORT;
+      PORT = process.env.PORT,
+      Sentry = require("@sentry/node");
+
+Sentry.init({
+    dsn: process.env.SENTRY_DSN,
+    integrations: [
+        // enable HTTP calls tracing
+        new Sentry.Integrations.Http({ tracing: true }),
+        // enable Express.js middleware tracing
+        new Sentry.Integrations.Express({ app }),
+    ],
+    tracesSampleRate: 1.0
+})
 
 const server = createServer(app);
-const io = new Server(server)
-app.use(logger('dev'))      
+const io = new Server(server);
+
+app.use(Sentry.Handlers.requestHandler());
+app.use(Sentry.Handlers.tracingHandler());
+
+app.use(logger('combined'))      
 app.use(cors())
 app.use(bodyParser.urlencoded({ extended: false }));     
 app.use(bodyParser.json())
 
 app.set("views", path.join(__dirname, 'views'))
 app.set("view engine", "ejs")   
-
-app.use(logger('dev'));
 
 app.get('/', (req, res)=>{
     res.send("Hello World")
@@ -42,7 +56,7 @@ io.on('connection', (socket) => {
       io.emit('newNotif', msg); 
     });
 });
-
+app.use(Sentry.Handlers.errorHandler());
 app.use(function(req, res, next) {
     next(createError(404, "Not found"));
 });
