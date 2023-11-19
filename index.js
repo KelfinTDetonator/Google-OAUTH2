@@ -56,6 +56,7 @@ io.on('connection', (socket) => {
       io.emit('newNotif', msg); 
     });
 });
+
 app.use(Sentry.Handlers.errorHandler());
 app.use(function(req, res, next) {
     next(createError(404, "Not found"));
