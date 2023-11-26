@@ -66,30 +66,14 @@ module.exports = {
             next(error)
         }
     },
-    loginGoogle: async(req, res, next)=>{
+    oauth2Verified: async(req,res,next)=>{
         try {
-            const {GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, CALLBACK_ENDPOINT} = process.env
-            const url = `${req.protocol}://${req.get('host')}${CALLBACK_ENDPOINT}`
-            const verif = await googleAuth(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, url).authenticate('google', { scope: ['profile', 'email'], failureRedirect: "/login", session: false })
-            if(!verif){
-                throw error
-            }
-            console.log(verif);
-            const user = req.user
-            const token = jwt.sign({user}, process.env.SECRET_KEY)
-            next()
+            let token = jwt.sign({...req.user, password: null}, process.env.SECRET_KEY)
+            res.status(200).json(response.success("OK", token))
         } catch (error) {
-            console.log(error);
             next(error)
         }
     },
-    // oauth2: async(req,res,next)=>{
-    //     try {
-            
-    //     } catch (error) {
-    //         next(error)
-    //     }
-    // },
     forgetPass: async(req, res, next)=>{
         try {
             const MINUTE = process.env.EXP_IN_MINUTE
