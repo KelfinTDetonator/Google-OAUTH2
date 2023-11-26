@@ -3,8 +3,9 @@ const { encryptData, verifyData } = require('../../utils/hash.utils'),
 response = require('../../utils/response.utils'),
 createError = require('http-errors'),
 jwt = require('jsonwebtoken'),
-mailer = require('../../utils/mailer.utils')
-
+mailer = require('../../utils/mailer.utils'),
+{ googleAuth } = require('../../utils/passport');
+const { error } = require('console');
 module.exports = {
     registerUser: async(req, res, next)=>{
         try {
@@ -65,7 +66,30 @@ module.exports = {
             next(error)
         }
     },
-
+    loginGoogle: async(req, res, next)=>{
+        try {
+            const {GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, CALLBACK_ENDPOINT} = process.env
+            const url = `${req.protocol}://${req.get('host')}${CALLBACK_ENDPOINT}`
+            const verif = await googleAuth(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, url).authenticate('google', { scope: ['profile', 'email'], failureRedirect: "/login", session: false })
+            if(!verif){
+                throw error
+            }
+            console.log(verif);
+            const user = req.user
+            const token = jwt.sign({user}, process.env.SECRET_KEY)
+            next()
+        } catch (error) {
+            console.log(error);
+            next(error)
+        }
+    },
+    // oauth2: async(req,res,next)=>{
+    //     try {
+            
+    //     } catch (error) {
+    //         next(error)
+    //     }
+    // },
     forgetPass: async(req, res, next)=>{
         try {
             const MINUTE = process.env.EXP_IN_MINUTE

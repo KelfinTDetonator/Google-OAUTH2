@@ -17,18 +17,6 @@
                 <button type="submit" id="submitLogin" class="btn btn-primary mb-3" style="width: 100%;">Login</button>
             </div>
         </form>
+        <button type="button" href="http:localhost:3000/api/v1/login/auth/google" class="btn btn-outline-dark">Login with google</button>
     </div>
-<script src="https://cdn.socket.io/4.5.4/socket.io.min.js"></script>
-<script>
-    try {
-        const socket = io();
-        const login = document.getElementById('submitLogin')
-
-        login.addEventListener('click', ()=>{
-            socket.emit('sendNotif', 'Welcome to the jungle')
-        })
-    } catch (error) {
-        console.error(error)
-    }
-</script>
 <%- include ('./footer') %>
