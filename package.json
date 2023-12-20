@@ -4,9 +4,11 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "gcp-build": "npm run build",
+    "build": "npx prisma db push",
     "test": "echo \"Error: no test specified\" && exit 1",
     "dev": "nodemon index.js",
-    "start": "node index.js"
+    "start": "NODE_ENV=production node index.js"
   },
   "keywords": [],
   "author": "",
@@ -21,13 +23,13 @@
     "express": "^4.18.2",
     "http-errors": "^2.0.0",
     "jsonwebtoken": "^9.0.2",
+    "morgan": "^1.10.0",
     "nodemailer": "^6.9.7",
     "passport": "^0.6.0",
     "passport-google-oauth20": "^2.0.0",
     "prisma": "^5.5.2"
   },
   "devDependencies": {
-    "morgan": "^1.10.0",
     "nodemon": "^3.0.1"
   }
 }
