@@ -2,17 +2,17 @@ require('dotenv').config()
 const express = require('express'),
       app     = express(),
       path = require('path'),
-      logger = require('morgan'),
+      morgan = require('morgan'),
       router = require('./src/routes/index'),
       cors = require('cors'),
       bodyParser = require('body-parser'),
       createError = require('http-errors'),
-      PORT = process.env.PORT;
-
-app.use(logger('combined'))      
-app.use(cors())
+      PORT = process.env.PORT || 8080;
+      
+app.use(cors());
+app.use(morgan("dev"));
 app.use(bodyParser.urlencoded({ extended: false }));     
-app.use(bodyParser.json())
+app.use(bodyParser.json());
 
 app.set("views", path.join(__dirname, 'views'))
 app.set("view engine", "ejs")   

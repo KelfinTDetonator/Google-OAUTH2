@@ -1,12 +1,17 @@
 const passport = require('passport');
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const { users } = require('../src/models/index');
-const {GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, CALLBACK_ENDPOINT} = process.env
+const {
+    GOOGLE_CLIENT_ID, 
+    GOOGLE_CLIENT_SECRET, 
+    CALLBACK_ENDPOINT,
+    CALLBACK_ENDPOINT_PROD,
+} = process.env
 
 passport.use(new GoogleStrategy( {
     clientID: GOOGLE_CLIENT_ID,
     clientSecret: GOOGLE_CLIENT_SECRET,
-    callbackURL: CALLBACK_ENDPOINT,
+    callbackURL: (process.env.NODE_ENV === "production") ? CALLBACK_ENDPOINT_PROD : CALLBACK_ENDPOINT,
 }, async function (accessToken, refreshToken, profile, done) {
     try {
         const user = await users.upsert({
