@@ -30,7 +30,7 @@ README.md
 :black_medium_square: User has successfully authorized by Google    
 ![Screenshot (1550)](https://github.com/KelfinTDetonator/Google-OAUTH2/assets/91953273/e046eba1-47eb-4166-aed1-9322c0832992)  
 :black_medium_square: User data in database  
-![Screenshot (1551)](https://github.com/KelfinTDetonator/Google-OAUTH2/assets/91953273/0b4b5b3a-2d65-492a-b1e9-f96956c1d8e8)
+![Screenshot (1551)_LI](https://github.com/KelfinTDetonator/Google-OAUTH2/assets/91953273/709688e9-7c6a-4226-8af4-ce079b5b1272)  
 
 ## Features :rocket:
 :black_medium_square: User authentication and authorization using Google OAUTH  
