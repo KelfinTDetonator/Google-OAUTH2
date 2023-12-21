@@ -1,6 +1,6 @@
 ## Usage Instructions
 1) Clone this repository
-```git clone https://github.com/KelfinTDetonator/Binar-challenge-chapter-7.git```
+```git clone https://github.com/KelfinTDetonator/Binar-challenge-chapter-7.git](https://github.com/KelfinTDetonator/Google-OAUTH2.git```
 2) Create your .env in local repository (or you can see an example in env.sample file)
 ```
 SECRET_KEY=
