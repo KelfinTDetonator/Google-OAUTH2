@@ -14,7 +14,7 @@ GOOGLE_CLIENT_SECRET=
 CALLBACK_ENDPOINT=
 ```
 3) ```npm install``` to install all packages provided in the package.json
-4) ```npx prisma migrate dev / npx prisma db push``` to migrate your database from prisma.schema
+4) ```npx prisma migrate dev``` or  ```npx prisma db push``` to migrate your database from prisma.schema
 5) Update your .gitignore
 ```
 node_modules
