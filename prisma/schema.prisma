@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -11,14 +8,30 @@ datasource db {
 }
 
 model User {
-  id         Int       @id @default(autoincrement())
-  email      String    @unique
+  id         Int          @id @default(autoincrement())
+  email      String       @unique
   password   String?
-  createdAt  DateTime  @default(now()) @map("created_at")
-  updatedAt  DateTime  @updatedAt @map("updated_at")
-  resetToken String?   @unique @map("reset_token")
+  createdAt  DateTime     @default(now()) @map("created_at")
+  updatedAt  DateTime     @updatedAt @map("updated_at")
+  resetToken String?      @unique @map("reset_token")
   resetExp   DateTime?
-  googleId   String    @map("google_id")
+  googleId   String?      @map("google_id")
+  profile    UserProfile?
 
   @@map("users")
+}
+
+model UserProfile {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique @map("user_id")
+  fullName  String?  @map("full_name")
+  bio       String?
+  avatarUrl String?  @map("avatar_url")
+  phone     String?
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_profiles")
 }

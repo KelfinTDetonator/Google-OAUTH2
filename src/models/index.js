@@ -3,4 +3,5 @@ const prisma = new PrismaClient()
 
 module.exports = {
     users: prisma.user,
+    userProfiles: prisma.userProfile,
 }
